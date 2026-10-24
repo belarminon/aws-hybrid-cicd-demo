@@ -69,7 +69,7 @@ To provide a real-world scenario, the accompanying GitHub repository contains a 
 * **Frontend**: **Vue.js 3** utilizing `localStorage` for offline persistence and light-speed reactivity without complex authentication overhead.
 * **Local Development**: Smart startup script (`check_docker.py`) that validates if **Docker Desktop** daemon is running before orchestrating `docker-compose`.
 
-👉 **[Access the GitHub Repository: aws-hybrid-cicd-demo](https://github.com/your-username/aws-hybrid-cicd-demo)**
+👉 **[Access the GitHub Repository: aws-hybrid-cicd-demo](https://github.com/belarminon/aws-hybrid-cicd-demo.git)**
 
 ---
 
@@ -165,27 +165,26 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Set up Python 3.11
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      - name: Install Dependencies and Run Tests
+      - name: Install Dependencies and Run Backend Tests
         run: |
-          python -m pip install --upgrade pip
-          pip install -r backend/requirements.txt pytest
-          pytest backend/tests
+          cd backend
+          pip install -r requirements.txt
 
       - name: Authenticate to AWS via OIDC
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::123456789012:role/GitHubActionsCodePipelineRole
-          aws-region: us-east-1
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
 
       - name: Package and Upload Artifact to Amazon S3
         run: |
-          zip -r release.zip . -x "*.git*" "frontend/node_modules/*"
-          aws s3 cp release.zip s3://my-aws-deploy-bucket/releases/app-${{ github.sha }}.zip
+          zip -r release.zip . -x "*.git*"
+          aws s3 cp release.zip s3://${{ vars.S3_BUCKET_NAME }}/releases/app-${{ github.sha }}.zip
 ```
 
 ---
@@ -209,14 +208,14 @@ def is_docker_running():
 def main():
     print("🔍 Checking Docker Desktop status...")
     if not is_docker_running():
-        print("⚠️ Docker Desktop is not running or initializing.")
-        print("🚀 Waiting for Docker daemon...")
+        print("⚠️ Docker Desktop daemon is not running.")
+        print("🚀 Waiting for Docker daemon to initialize...")
         
         retries = 5
         while retries > 0:
             time.sleep(3)
             if is_docker_running():
-                print("✅ Docker Daemon active!")
+                print("✅ Docker Daemon is ready!")
                 break
             retries -= 1
         else:
@@ -225,8 +224,8 @@ def main():
     else:
         print("✅ Docker Desktop is running.")
 
-    print("📦 Spinning up ecosystem containers with docker-compose...")
-    subprocess.run(["docker-compose", "up", "-d", "--build"])
+    print("📦 Launching isolated containers for 'aws-pet-owner-app'...")
+    subprocess.run(["docker-compose", "-p", "aws-pet-owner-app", "up", "-d", "--build"])
 
 if __name__ == "__main__":
     main()
