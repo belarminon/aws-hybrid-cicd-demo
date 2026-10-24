@@ -93,15 +93,20 @@ would need to be configured separately.
 
 ## 4. Run the application locally in isolation
 
-Run commands from the repository root. The helper script waits briefly for the
-Docker daemon if it is not ready, then builds and starts this Compose project
-with the fixed project name `aws-pet-owner-app`:
+Run commands from the repository root. `app_start.sh` calls
+`check_docker.py` relative to its own location; the helper waits briefly for
+the Docker daemon if it is not ready, then builds and starts the Compose
+project `aws-pet-owner-app`:
 
 ```bash
-python scripts/check_docker.py
+bash scripts/app_start.sh
 ```
 
-The script requires the `docker-compose` executable (Compose v1-style command).
+The helper supports either `docker compose` or `docker-compose`. It prefers
+host ports `3000` and `8000`; if either is occupied, it selects an available
+port in the next 99 ports and prints the URLs to use. It does not stop another
+process that is already listening on a port.
+
 Check that the containers are running:
 
 ```bash
@@ -112,7 +117,7 @@ The Compose file assigns the container names `pet-owner-backend` and
 `pet-owner-frontend`. The project name also scopes Compose networks and other
 project-managed resources.
 
-Open:
+Open the URLs printed by the startup helper. If the default ports were free:
 
 - Frontend: <http://localhost:3000>
 - Backend health: <http://localhost:8000/health>
@@ -121,16 +126,16 @@ Open:
 Stop only this application using the same project name:
 
 ```bash
-docker-compose -p aws-pet-owner-app down --remove-orphans
+bash scripts/app_stop.sh
 ```
 
 This is the same project identifier used by `scripts/check_docker.py` and
-`scripts/app_stop.sh`. Do not omit `-p aws-pet-owner-app` when stopping the
-project if you need to ensure Compose targets this named project.
+`scripts/app_stop.sh`.
 
 ## 5. Operational notes
 
-- Ports `3000` and `8000` must be available on the host.
+- The startup helper selects available host ports starting at `3000` and
+  `8000`; use its printed URLs if it chooses alternatives.
 - The frontend saves its data in browser `localStorage`; it does not currently
   call the backend API.
 - The backend stores data in process memory and loses it when its container

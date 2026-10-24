@@ -1,3 +1,15 @@
 #!/bin/bash
-cd /var/www/aws-hybrid-cicd-demo
-docker-compose -p aws-pet-owner-app up -d --build
+set -euo pipefail
+
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+
+if command -v python3 >/dev/null 2>&1; then
+  PYTHON=python3
+elif command -v python >/dev/null 2>&1; then
+  PYTHON=python
+else
+  echo "Error: Python 3 is required to run scripts/check_docker.py." >&2
+  exit 1
+fi
+
+exec "$PYTHON" "$SCRIPT_DIR/check_docker.py"

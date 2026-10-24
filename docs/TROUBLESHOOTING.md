@@ -60,24 +60,21 @@ running or exits after its retries.
 1. Start Docker Desktop or the Docker Engine service.
 2. Confirm the active Docker context is usable with `docker info`.
 3. Retry `python scripts/check_docker.py`.
-4. Verify the `docker-compose` command is installed and available on `PATH`:
+4. Verify that either supported Compose command is available:
 
    ```bash
-   docker-compose version
+   docker compose version
    ```
 
 The helper waits for up to five retries, sleeping three seconds between
-attempts. It checks the Docker daemon but invokes the separate
-`docker-compose` command to start the project.
+attempts. It supports `docker compose` and the standalone `docker-compose`
+command.
 
 ## Compose reports that the compose command is missing
 
-The local helper and CodeDeploy hooks use `docker-compose`, not
-`docker compose`. Install a compatible Compose v1 executable or update the
-scripts to the Compose v2 plugin command before relying on v2-only installations.
-The helper currently checks the daemon but does not check whether
-`docker-compose` is installed, so a missing executable will cause startup to
-fail.
+The startup helper and CodeDeploy hooks support both the Docker Compose v2
+plugin (`docker compose`) and the standalone `docker-compose` command. Install
+either one and make sure it is available on `PATH`.
 
 ## Bash reports `app_start.sh: command not found`
 
@@ -94,26 +91,31 @@ On a Linux host, if the script has its executable bit set, this also works:
 ./app_start.sh
 ```
 
-However, `app_start.sh` is a CodeDeploy hook: it changes to
-`/var/www/aws-hybrid-cicd-demo` and runs `docker-compose`. Running it from
-Git Bash on Windows is not a local-development start command; that Linux
-deployment directory is not the repository's Windows checkout. To run the
-application locally, return to the repository root and use:
+`app_start.sh` now locates `check_docker.py` relative to itself, so it can be
+run from the repository's `scripts` directory in Git Bash or Linux. From the
+repository root, it can also be run as:
 
 ```bash
-python scripts/check_docker.py
+bash scripts/app_start.sh
 ```
 
-This local helper also requires Docker and the `docker-compose` command.
+The script requires Python 3, Docker, and either `docker compose` or
+`docker-compose`. It no longer changes to a hard-coded Linux checkout path.
 
 ## Ports 3000 or 8000 are already allocated
 
-**Symptoms:** Docker cannot bind a host port during startup.
+The startup helper checks whether host ports `3000` (frontend) and `8000`
+(backend) are available. If either is occupied, it selects the next available
+port in that service's range (`3000`-`3099` for the frontend and `8000`-`8099`
+for the backend) and prints the resulting URLs. It does not stop or alter the
+process using the original port.
 
-Find which process or container is using the port, then stop only that process
-or container if appropriate. Alternatively, change the host-side port mapping
-in `docker-compose.yml` while keeping the container-side port unchanged. For
-example, `3001:3000` publishes the frontend on host port `3001`.
+If all ports in a range are unavailable, the helper reports an error rather
+than stopping another process. If Docker still reports a bind error after
+selection, another process may have claimed that port between the check and
+container startup. Retry the helper or set `FRONTEND_PORT` / `BACKEND_PORT`
+manually when running Compose. The `docker-compose.yml` mappings use those
+variables and default to ports `3000` and `8000`.
 
 ## The app starts but containers are not visible under the expected project
 
@@ -123,14 +125,14 @@ file also defines the explicit container names `pet-owner-backend` and
 
 ```bash
 docker ps --filter "name=pet-owner"
-docker-compose -p aws-pet-owner-app ps
+docker compose -p aws-pet-owner-app ps
 ```
 
 If starting or stopping manually, use the same project name:
 
 ```bash
-docker-compose -p aws-pet-owner-app up -d --build
-docker-compose -p aws-pet-owner-app down --remove-orphans
+docker compose -p aws-pet-owner-app up -d --build
+docker compose -p aws-pet-owner-app down --remove-orphans
 ```
 
 Explicit container names are global to the Docker host and cannot be reused by

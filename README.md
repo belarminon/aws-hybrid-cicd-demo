@@ -65,26 +65,28 @@ The frontend and backend are separate demo implementations:
 Requirements:
 
 - Docker Engine/Desktop with Docker Compose available
-- Ports `3000` and `8000` available on the host
 
 From the repository root:
 
 ```bash
-docker compose up --build
+bash scripts/app_start.sh
 ```
 
-Open the frontend at <http://localhost:3000>. The backend API is available at
-<http://localhost:8000>, with interactive API documentation at
-<http://localhost:8000/docs>.
+The helper builds and starts the isolated `aws-pet-owner-app` Compose project.
+It uses ports `3000` and `8000` when available, otherwise selects and prints
+available alternatives. Open the URLs printed by the script. If you run
+`docker compose up --build` directly instead, its default host ports remain
+`3000` and `8000`.
 
 To stop the containers:
 
 ```bash
-docker compose down
+bash scripts/app_stop.sh
 ```
 
-The Compose file builds both services from their respective directories and
-publishes port `3000` for the frontend and `8000` for the API.
+The Compose file builds both services from their respective directories. The
+startup helper configures the host ports; the container ports remain `3000`
+for the frontend and `8000` for the API.
 
 For AWS OIDC setup, local isolated startup, and recovery steps, see the
 [Operations Runbook](docs/RUNBOOK.md) and

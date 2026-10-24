@@ -5,7 +5,7 @@ services:
     container_name: pet-owner-backend
     build: ./backend
     ports:
-      - "8000:8000"
+      - "${BACKEND_PORT:-8000}:8000"
     environment:
       - ENV=development
 
@@ -13,6 +13,6 @@ services:
     container_name: pet-owner-frontend
     build: ./frontend
     ports:
-      - "3000:3000"
+      - "${FRONTEND_PORT:-3000}:3000"
     depends_on:
       - backend
