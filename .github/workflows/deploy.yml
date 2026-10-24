@@ -26,15 +26,14 @@ jobs:
         run: |
           cd backend
           pip install -r requirements.txt
-          # Run pytest or validation scripts if added
 
       - name: Authenticate to AWS via OIDC
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::123456789012:role/GitHubActionsCodePipelineRole
-          aws-region: us-east-1
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
 
       - name: Package and Upload Artifact to Amazon S3
         run: |
           zip -r release.zip . -x "*.git*"
-          aws s3 cp release.zip s3://aws-hybrid-cicd-artifacts-bucket/releases/app-${{ github.sha }}.zip
+          aws s3 cp release.zip s3://${{ vars.S3_BUCKET_NAME }}/releases/app-${{ github.sha }}.zip

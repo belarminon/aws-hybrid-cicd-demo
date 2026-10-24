@@ -1,5 +1,8 @@
+name: aws-pet-owner-app
+
 services:
   backend:
+    container_name: pet-owner-backend
     build: ./backend
     ports:
       - "8000:8000"
@@ -7,6 +10,7 @@ services:
       - ENV=development
 
   frontend:
+    container_name: pet-owner-frontend
     build: ./frontend
     ports:
       - "3000:3000"

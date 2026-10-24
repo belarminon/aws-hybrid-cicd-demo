@@ -28,8 +28,8 @@ def main():
     else:
         print("✅ Docker Desktop is running.")
 
-    print("📦 Launching containers with docker-compose...")
-    subprocess.run(["docker-compose", "up", "-d", "--build"])
+    print("📦 Launching isolated containers for 'aws-pet-owner-app'...")
+    subprocess.run(["docker-compose", "-p", "aws-pet-owner-app", "up", "-d", "--build"])
 
 if __name__ == "__main__":
     main()
