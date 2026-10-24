@@ -1,0 +1,40 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Dependencies and Run Backend Tests
+        run: |
+          cd backend
+          pip install -r requirements.txt
+          # Run pytest or validation scripts if added
+
+      - name: Authenticate to AWS via OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::123456789012:role/GitHubActionsCodePipelineRole
+          aws-region: us-east-1
+
+      - name: Package and Upload Artifact to Amazon S3
+        run: |
+          zip -r release.zip . -x "*.git*"
+          aws s3 cp release.zip s3://aws-hybrid-cicd-artifacts-bucket/releases/app-${{ github.sha }}.zip

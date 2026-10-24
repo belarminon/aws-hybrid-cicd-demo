@@ -1,0 +1,14 @@
+version: 0.0
+os: linux
+files:
+  - source: /
+    destination: /var/www/aws-hybrid-cicd-demo
+hooks:
+  ApplicationStop:
+    - location: scripts/app_stop.sh
+      timeout: 30
+      runas: root
+  ApplicationStart:
+    - location: scripts/app_start.sh
+      timeout: 30
+      runas: root
