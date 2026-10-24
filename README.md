@@ -38,8 +38,7 @@ The frontend and backend are separate demo implementations:
 │   ├── Dockerfile
 │   └── requirements.txt
 ├── frontend/
-│   ├── public/
-│   │   └── index.html      # Vite HTML entry point
+│   ├── index.html          # Vite HTML entry point
 │   ├── src/
 │   │   ├── App.vue          # Pet and owner UI
 │   │   └── main.js
@@ -77,6 +76,10 @@ It uses ports `3000` and `8000` when available, otherwise selects and prints
 available alternatives. Open the URLs printed by the script. If you run
 `docker compose up --build` directly instead, its default host ports remain
 `3000` and `8000`.
+
+The frontend URL serves the Vue application. For the backend, use
+`/health` to check its status, `/docs` for the interactive API, or `/` for
+service information.
 
 To stop the containers:
 
@@ -134,6 +137,7 @@ All data is held in memory and resets when the API process restarts.
 
 | Method | Path | Description |
 | --- | --- | --- |
+| `GET` | `/` | API service information and useful links |
 | `GET` | `/health` | Health status |
 | `GET` | `/owners` | List owners |
 | `POST` | `/owners` | Create an owner |

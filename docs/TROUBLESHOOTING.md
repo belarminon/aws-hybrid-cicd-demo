@@ -117,6 +117,11 @@ container startup. Retry the helper or set `FRONTEND_PORT` / `BACKEND_PORT`
 manually when running Compose. The `docker-compose.yml` mappings use those
 variables and default to ports `3000` and `8000`.
 
+When the helper chooses an alternate port, use the exact URL it prints; for
+example, if it reports frontend port `3001`, open `http://localhost:3001`.
+The API root `http://localhost:8000/` returns service information, while
+`/health` and `/docs` are the health check and interactive API documentation.
+
 ## The app starts but containers are not visible under the expected project
 
 The helper starts Compose with project name `aws-pet-owner-app`, and the Compose

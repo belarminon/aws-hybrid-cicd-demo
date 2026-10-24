@@ -120,6 +120,7 @@ project-managed resources.
 Open the URLs printed by the startup helper. If the default ports were free:
 
 - Frontend: <http://localhost:3000>
+- Backend service information: <http://localhost:8000/>
 - Backend health: <http://localhost:8000/health>
 - Backend API documentation: <http://localhost:8000/docs>
 

@@ -20,6 +20,15 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.get("/")
+def root():
+    return {
+        "service": "Pet & Owner API",
+        "status": "healthy",
+        "health": "/health",
+        "docs": "/docs",
+    }
+
 @app.get("/health", status_code=status.HTTP_200_OK)
 def health_check():
     return {"status": "healthy", "service": "Pet & Owner API"}
