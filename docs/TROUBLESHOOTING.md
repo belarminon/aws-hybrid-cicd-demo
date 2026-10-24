@@ -79,6 +79,33 @@ The helper currently checks the daemon but does not check whether
 `docker-compose` is installed, so a missing executable will cause startup to
 fail.
 
+## Bash reports `app_start.sh: command not found`
+
+Bash does not search the current directory for commands by default. From the
+`scripts` directory, invoke the file with an explicit relative path:
+
+```bash
+bash ./app_start.sh
+```
+
+On a Linux host, if the script has its executable bit set, this also works:
+
+```bash
+./app_start.sh
+```
+
+However, `app_start.sh` is a CodeDeploy hook: it changes to
+`/var/www/aws-hybrid-cicd-demo` and runs `docker-compose`. Running it from
+Git Bash on Windows is not a local-development start command; that Linux
+deployment directory is not the repository's Windows checkout. To run the
+application locally, return to the repository root and use:
+
+```bash
+python scripts/check_docker.py
+```
+
+This local helper also requires Docker and the `docker-compose` command.
+
 ## Ports 3000 or 8000 are already allocated
 
 **Symptoms:** Docker cannot bind a host port during startup.
