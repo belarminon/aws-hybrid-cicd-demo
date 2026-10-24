@@ -48,6 +48,9 @@ The frontend and backend are separate demo implementations:
 │   └── vite.config.js
 ├── iac/
 │   └── template.yaml        # AWS OIDC, IAM role, and artifact bucket
+├── docs/
+│   ├── RUNBOOK.md           # AWS OIDC setup and local operations
+│   └── TROUBLESHOOTING.md   # CI/CD, Docker, and application troubleshooting
 ├── scripts/
 │   ├── app_start.sh         # CodeDeploy start hook
 │   ├── app_stop.sh          # CodeDeploy stop hook
@@ -82,6 +85,10 @@ docker compose down
 
 The Compose file builds both services from their respective directories and
 publishes port `3000` for the frontend and `8000` for the API.
+
+For AWS OIDC setup, local isolated startup, and recovery steps, see the
+[Operations Runbook](docs/RUNBOOK.md) and
+[Troubleshooting Guide](docs/TROUBLESHOOTING.md).
 
 ## Run services locally
 
